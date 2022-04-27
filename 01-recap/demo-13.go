@@ -33,18 +33,39 @@ func main() {
 	/*
 		for i := 0; i < 10; i++ {
 			evenNo := <-evenCh
-			fmt.Println("Even -", evenNo)
+
 			oddNo := <-oddCh
 			fmt.Println("Odd -", oddNo)
 		}
 	*/
+	evenDone := func() chan bool {
+		done := make(chan bool)
+		go func() {
+			for evenNo := range evenCh {
+				fmt.Println("Even -", evenNo)
+			}
+			done <- true
+		}()
+		return done
+	}()
 
-	for {
+	oddDone := func() chan bool {
+		done := make(chan bool)
+		go func() {
+			for oddNo := range oddCh {
+				fmt.Println("Odd -", oddNo)
+			}
+			done <- true
+		}()
+		return done
+	}()
+
+	for i := 0; i < 2; i++ {
 		select {
-		case oddNo := <-oddCh:
-			fmt.Println("Odd -", oddNo)
-		case evenNo := <-evenCh:
-			fmt.Println("Even -", evenNo)
+		case <-oddDone:
+			fmt.Println("Odd numbers done")
+		case <-evenDone:
+			fmt.Println("Even numbers done")
 		}
 	}
 
