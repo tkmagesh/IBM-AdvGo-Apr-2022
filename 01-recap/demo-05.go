@@ -7,7 +7,6 @@ import (
 
 /* Communicate by sharing memory (NOT ADVICABLE) */
 var counter int
-
 var mutex sync.Mutex
 
 func main() {
