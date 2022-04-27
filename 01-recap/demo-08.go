@@ -2,23 +2,19 @@ package main
 
 import (
 	"fmt"
-	"sync"
 )
 
 func main() {
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
+
 	fmt.Println("main started")
 	ch := make(chan int)
-	go add(100, 200, wg, ch)
+	go add(100, 200, ch)
 	result := <-ch //receive operation
-	wg.Wait()
 	fmt.Println("result =", result)
 	fmt.Println("main completed")
 }
 
-func add(x, y int, wg *sync.WaitGroup, ch chan int) {
-	defer wg.Done()
+func add(x, y int, ch chan int) {
 	result := x + y
 	ch <- result //send operation
 }
