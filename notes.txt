@@ -25,3 +25,9 @@ Go
     Higher Order Functions
     Duck typing (implicitly implemented interfaces)
     Concurrency
+
+
+Concurrency
+    NEVER ASSUME the following
+        1. the sequence of execution of your goroutines
+        2. the time taken for a goroutine to complete its job
