@@ -31,3 +31,9 @@ Concurrency
     NEVER ASSUME the following
         1. the sequence of execution of your goroutines
         2. the time taken for a goroutine to complete its job
+
+    Channels
+        Receive operation is ALWAYS a blocking operation
+        A Send operation is blocked until a receive operation on the channel is initiated (non-buffered Channel)
+        In a buffered channel, the send operation will be successful even when a receive operation is not initiated
+            coz, the data will be kept in the buffer
