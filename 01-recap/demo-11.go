@@ -9,23 +9,24 @@ func main() {
 	nos := genEvenNos()
 	for {
 		evenNo, success := <-nos
-		if !success {
-			break
+		if success {
+			fmt.Println(evenNo)
+			continue
 		}
-		fmt.Println(evenNo)
+		break
 	}
 	fmt.Println("Done")
 }
 
-func genEvenNos() (nos chan int) {
-	nos = make(chan int)
+func genEvenNos() <-chan int {
+	nos := make(chan int)
 	count := 10
-	go func() {
+	go func(data chan<- int) {
 		for i := 0; i < count; i++ {
 			time.Sleep(500 * time.Millisecond)
-			nos <- i * 2
+			data <- i * 2
 		}
-		close(nos)
-	}()
+		close(data)
+	}(nos)
 	return nos
 }
