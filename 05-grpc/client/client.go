@@ -20,7 +20,8 @@ func main() {
 	service := proto.NewAppServiceClient(clientConn)
 	ctx := context.Background()
 	//doRequestResponse(ctx, service)
-	doServerStreaming(ctx, service)
+	doRequestResponseWithInterrupt(ctx, service)
+	//doServerStreaming(ctx, service)
 }
 
 func doRequestResponse(ctx context.Context, service proto.AppServiceClient) {
@@ -29,6 +30,26 @@ func doRequestResponse(ctx context.Context, service proto.AppServiceClient) {
 		Y: 200,
 	}
 	addResponse, err := service.Add(ctx, addRequest)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	fmt.Println("Add Operation : Result =", addResponse.GetResult())
+}
+
+func doRequestResponseWithInterrupt(ctx context.Context, service proto.AppServiceClient) {
+	reqCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func() {
+		fmt.Println("Hit ENTER to cancel....")
+		var input string
+		fmt.Scanln(&input)
+		cancel()
+	}()
+	addRequest := &proto.AddRequest{
+		X: 100,
+		Y: 200,
+	}
+	addResponse, err := service.Add(reqCtx, addRequest)
 	if err != nil {
 		log.Fatalln(err)
 	}

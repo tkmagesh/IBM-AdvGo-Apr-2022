@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"grpc-demo/proto"
 	"log"
@@ -15,15 +16,28 @@ type appServiceImpl struct {
 	proto.UnimplementedAppServiceServer
 }
 
-func (asi *appServiceImpl) Add(ctx context.Context, req *proto.AddRequest) (*proto.AddResponse, error) {
+func (asi *appServiceImpl) Add(ctx context.Context, req *proto.AddRequest) (res *proto.AddResponse, er error) {
 	x := req.GetX()
 	y := req.GetY()
 	fmt.Printf("Add Operation invoked with x=%d and y=%d\n", x, y)
-	result := x + y
-	res := &proto.AddResponse{
-		Result: result,
+	timeOut := time.After(10 * time.Second)
+
+LOOP:
+	for {
+		select {
+		case <-timeOut:
+			result := x + y
+			res = &proto.AddResponse{
+				Result: result,
+			}
+			break LOOP
+		case <-ctx.Done():
+			fmt.Println("Cancel instruction received")
+			er = errors.New("interrupt received")
+			break LOOP
+		}
 	}
-	return res, nil
+	return
 }
 
 func (asi *appServiceImpl) GeneratePrimes(req *proto.PrimeRequest, serverStream proto.AppService_GeneratePrimesServer) error {
