@@ -38,7 +38,7 @@ func main() {
 		for _, name := range names {
 			np := &NamePrinter{
 				name:  name,
-				delay: time.Duration(time.Duration(timerCounter) * time.Second),
+				delay: time.Duration(time.Duration(timerCounter) * 100 * time.Millisecond),
 			}
 			timerCounter++
 			w.Run(np)
