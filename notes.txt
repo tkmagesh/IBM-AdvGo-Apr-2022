@@ -62,3 +62,19 @@ Process
     Implement the Service Contract
         Service Implementation
     Host the server
+
+    Installation
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+        (when the above is installed, executables are created in the gopath/bin folder. Make sure this path is set in environment variables)
+
+        Windows
+            Install the binaries from https://github.com/protocolbuffers/protobuf/releases/
+
+        Mac
+            brew install protoc-gen-go
+            brew install protoc-gen-go-grpc
+
+To generate the proxy and stub
+    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/service.proto
