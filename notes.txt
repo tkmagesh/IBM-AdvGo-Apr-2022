@@ -40,3 +40,25 @@ Concurrency
 
     Modify the demo-15.go in such way that  the "genEvenNos" will keep generating even numbers until the user hits the ENTER key
     NOTE : Do not accept user input in the genEvenNos() function
+
+GRPC
+    protocol buffers
+    http2
+    multi language support
+    Communication Patterns
+        Request & Response
+        Client Streaming (multiple requests & one response)
+        Server Streaming (one request & multiple responses)
+        Bi-directional Streaming (multiple requests & multiple responses)
+        
+Process
+    Define Schema (in protocol buffers)
+        Service Contract
+        Operation Contract
+        Data Contract
+    Generate code (protoc)
+        Proxy (client)
+        Stub (server)
+    Implement the Service Contract
+        Service Implementation
+    Host the server
