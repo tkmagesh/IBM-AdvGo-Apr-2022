@@ -90,3 +90,6 @@ Http Services
 Web Socket
     HTML5 standard
     Supported in all the browsers
+
+Benchmarking
+     go test -bench=. ./... -benchmem
