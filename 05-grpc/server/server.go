@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"grpc-demo/proto"
+	"io"
 	"log"
 	"net"
 	"time"
@@ -53,6 +54,32 @@ func (asi *appServiceImpl) GeneratePrimes(req *proto.PrimeRequest, serverStream 
 			serverStream.Send(res)
 		}
 	}
+	return nil
+}
+
+func (asi *appServiceImpl) CalculateAverage(serverStream proto.AppService_CalculateAverageServer) error {
+	var sum, count int32
+	fmt.Println("Calculate Average")
+	for {
+		req, err := serverStream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		no := req.GetNo()
+		fmt.Printf("Received : %d\n", no)
+		sum += no
+		count++
+		time.Sleep(1 * time.Second)
+	}
+	avg := sum / count
+	res := &proto.AverageResponse{
+		Result: avg,
+	}
+	serverStream.SendAndClose(res)
 	return nil
 }
 
