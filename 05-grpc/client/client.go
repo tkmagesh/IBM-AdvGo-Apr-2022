@@ -15,6 +15,14 @@ import (
 )
 
 func main() {
+	/*
+		certFile := "ssl-2/ca.crt"
+		creds, sslErr := credentials.NewClientTLSFromFile(certFile, "")
+		if sslErr != nil {
+			log.Fatalln(sslErr)
+		}
+		options := grpc.WithTransportCredentials(creds)
+	*/
 	options := grpc.WithTransportCredentials(insecure.NewCredentials())
 	clientConn, err := grpc.Dial("localhost:50051", options)
 	if err != nil {
@@ -22,12 +30,12 @@ func main() {
 	}
 	service := proto.NewAppServiceClient(clientConn)
 	ctx := context.Background()
-	//doRequestResponse(ctx, service)
+	doRequestResponse(ctx, service)
 	//doRequestResponseWithInterrupt(ctx, service)
 	//doServerStreaming(ctx, service)
 	//doClientStreaming(ctx, service)
 	//doBiDiStreaming(ctx, service)
-	doRequestResponseWithTimeout(ctx, service)
+	//doRequestResponseWithTimeout(ctx, service)
 }
 
 func doRequestResponse(ctx context.Context, service proto.AppServiceClient) {

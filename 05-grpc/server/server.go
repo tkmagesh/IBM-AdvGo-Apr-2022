@@ -121,6 +121,16 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	/*
+		certFile := "ssl-2/server.crt"
+		keyFile := "ssl-2/server.pem"
+		creds, sslErr := credentials.NewServerTLSFromFile(certFile, keyFile)
+		if sslErr != nil {
+			log.Fatalln(sslErr)
+		}
+		opts := grpc.Creds(creds)
+		grpcServer := grpc.NewServer(opts)
+	*/
 	grpcServer := grpc.NewServer()
 	proto.RegisterAppServiceServer(grpcServer, asi)
 	grpcServer.Serve(listener)
