@@ -86,6 +86,9 @@ func (asi *appServiceImpl) CalculateAverage(serverStream proto.AppService_Calcul
 func (asi *appServiceImpl) Greet(stream proto.AppService_GreetServer) error {
 	for {
 		req, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -99,6 +102,7 @@ func (asi *appServiceImpl) Greet(stream proto.AppService_GreetServer) error {
 			log.Fatalln(err)
 		}
 	}
+	return nil
 }
 
 func isPrime(no int32) bool {

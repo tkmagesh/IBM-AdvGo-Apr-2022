@@ -140,6 +140,7 @@ func doBiDiStreaming(ctx context.Context, service proto.AppServiceClient) {
 
 	for _, personName := range personNames {
 		fmt.Printf("Sending Person %v\n", personName)
+		time.Sleep(500 * time.Millisecond)
 		req := &proto.GreetRequest{
 			Person: &personName,
 		}
@@ -148,6 +149,6 @@ func doBiDiStreaming(ctx context.Context, service proto.AppServiceClient) {
 			log.Fatalln(err)
 		}
 	}
-
+	clientStream.CloseSend()
 	<-done
 }
