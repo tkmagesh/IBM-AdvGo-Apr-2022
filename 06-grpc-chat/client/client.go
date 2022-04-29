@@ -9,7 +9,6 @@ import (
 	"grpc-chat/proto"
 	"log"
 	"os"
-	"sync"
 	"time"
 
 	"google.golang.org/grpc"
@@ -35,24 +34,43 @@ func main() {
 	connect(user)
 
 	//get input from stdin and send to the server
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
+	done := make(chan struct{})
 	go func() {
-		defer wg.Done()
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
+			msgText := scanner.Text()
+			if msgText == "exit" {
+				break
+			}
 			msg := &proto.Message{
 				Id:      user.Id,
-				Content: scanner.Text(),
+				Content: msgText,
 			}
 			if _, err := client.BroadcastMessage(context.Background(), msg); err != nil {
 				log.Fatalln(err)
 				break
 			}
 		}
+		close(done)
 	}()
-	wg.Wait()
+	<-done
 
+	/* var input string
+	fmt.Scanln(&input)
+	go func() {
+		for i := 0; i < 1000000; i++ {
+			msg := &proto.Message{
+				Id:      user.Id,
+				Content: fmt.Sprintf("Hi [from %q]", *name),
+			}
+			if _, err := client.BroadcastMessage(context.Background(), msg); err != nil {
+				log.Fatalln(err)
+				break
+			}
+		}
+		close(done)
+	}()
+	<-done */
 }
 
 func connect(user *proto.User) {

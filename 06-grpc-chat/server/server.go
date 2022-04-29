@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"grpc-chat/proto"
 	"log"
 	"net"
@@ -33,6 +34,7 @@ func (s *server) SignIn(con *proto.Connect, stream proto.Broadcast_SignInServer)
 		error:    make(chan error),
 	}
 	s.Connections = append(s.Connections, conn)
+	fmt.Printf("User %q signed in \n", user.GetName())
 	return <-conn.error
 }
 
