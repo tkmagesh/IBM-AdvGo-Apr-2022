@@ -23,7 +23,8 @@ func main() {
 	//doRequestResponse(ctx, service)
 	//doRequestResponseWithInterrupt(ctx, service)
 	//doServerStreaming(ctx, service)
-	doClientStreaming(ctx, service)
+	//doClientStreaming(ctx, service)
+	doBiDiStreaming(ctx, service)
 }
 
 func doRequestResponse(ctx context.Context, service proto.AppServiceClient) {
@@ -84,6 +85,7 @@ func doClientStreaming(ctx context.Context, service proto.AppServiceClient) {
 	nos := []int32{3, 1, 4, 2, 5, 9, 6, 8, 7}
 	clientStream, err := service.CalculateAverage(ctx)
 	if err != nil {
+		log.Println("Connection error")
 		log.Fatalln(err)
 	}
 	for _, no := range nos {
@@ -102,4 +104,50 @@ func doClientStreaming(ctx context.Context, service proto.AppServiceClient) {
 		log.Fatalln(err)
 	}
 	fmt.Printf("Average = %d\n", res.GetResult())
+}
+
+func doBiDiStreaming(ctx context.Context, service proto.AppServiceClient) {
+	personNames := []proto.PersonName{
+		proto.PersonName{FirstName: "Magesh", LastName: "Kuppan"},
+		proto.PersonName{FirstName: "Suresh", LastName: "Kannan"},
+		proto.PersonName{FirstName: "Rajesh", LastName: "Pandit"},
+		proto.PersonName{FirstName: "Ganesh", LastName: "Easwaran"},
+		proto.PersonName{FirstName: "Ramesh", LastName: "Jayaraman"},
+	}
+	clientStream, err := service.Greet(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	//handle responses
+	done := func() <-chan struct{} {
+		doneCh := make(chan struct{})
+		go func() {
+			for {
+				res, err := clientStream.Recv()
+				if err == io.EOF {
+					break
+				}
+				if err != nil {
+					log.Fatalln(err)
+				}
+				msg := res.GetGreetMessage()
+				fmt.Println(msg)
+			}
+			close(doneCh)
+		}()
+		return doneCh
+	}()
+
+	for _, personName := range personNames {
+		fmt.Printf("Sending Person %v\n", personName)
+		req := &proto.GreetRequest{
+			Person: &personName,
+		}
+		err := clientStream.Send(req)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	<-done
 }

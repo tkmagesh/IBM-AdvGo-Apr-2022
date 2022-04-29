@@ -83,6 +83,24 @@ func (asi *appServiceImpl) CalculateAverage(serverStream proto.AppService_Calcul
 	return nil
 }
 
+func (asi *appServiceImpl) Greet(stream proto.AppService_GreetServer) error {
+	for {
+		req, err := stream.Recv()
+		if err != nil {
+			log.Fatalln(err)
+		}
+		personName := req.GetPerson()
+		msg := fmt.Sprintf("Hi %s, %s!", personName.GetFirstName(), personName.GetLastName())
+		res := &proto.GreetResponse{
+			GreetMessage: msg,
+		}
+		er := stream.Send(res)
+		if er != nil {
+			log.Fatalln(err)
+		}
+	}
+}
+
 func isPrime(no int32) bool {
 	for i := int32(2); i <= (no / 2); i++ {
 		if no%i == 0 {
