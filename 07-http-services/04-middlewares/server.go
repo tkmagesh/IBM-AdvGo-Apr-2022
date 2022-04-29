@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+type Middleware func(http.HandlerFunc) http.HandlerFunc
+
 func logger(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("request received")
@@ -37,12 +39,29 @@ func bar(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Bar"))
 }
 
+func chain(handler http.HandlerFunc, middlewares ...Middleware) http.HandlerFunc {
+	for _, m := range middlewares {
+		handler = m(handler)
+	}
+	return handler
+}
+
 func main() {
-	fooWithLogger := logger(foo)
-	barWithLogger := logger(bar)
-	fooWithLoggerAndProfile := profile(fooWithLogger)
-	barWithLoggerAndProfile := profile(barWithLogger)
-	http.HandleFunc("/foo", fooWithLoggerAndProfile)
-	http.HandleFunc("/bar", barWithLoggerAndProfile)
+	/*
+		fooWithLogger := logger(foo)
+		barWithLogger := logger(bar)
+		fooWithLoggerAndProfile := profile(fooWithLogger)
+		barWithLoggerAndProfile := profile(barWithLogger)
+		http.HandleFunc("/foo", fooWithLoggerAndProfile)
+		http.HandleFunc("/bar", barWithLoggerAndProfile)
+	*/
+
+	/*
+		http.HandleFunc("/foo", profile(logger(foo)))
+		http.HandleFunc("/bar", profile(logger(bar)))
+	*/
+
+	http.HandleFunc("/foo", chain(foo, logger, profile))
+	http.HandleFunc("/bar", chain(bar, logger, profile))
 	http.ListenAndServe(":8080", nil)
 }

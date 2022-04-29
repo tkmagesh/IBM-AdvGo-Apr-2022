@@ -83,3 +83,10 @@ Http Services
     - platform APIs
     - Libraries
         Routing
+
+    - JWT middleware for Gin
+        https://github.com/appleboy/gin-jwt
+
+Web Socket
+    HTML5 standard
+    Supported in all the browsers
