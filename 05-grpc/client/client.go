@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 func main() {
@@ -24,7 +26,8 @@ func main() {
 	//doRequestResponseWithInterrupt(ctx, service)
 	//doServerStreaming(ctx, service)
 	//doClientStreaming(ctx, service)
-	doBiDiStreaming(ctx, service)
+	//doBiDiStreaming(ctx, service)
+	doRequestResponseWithTimeout(ctx, service)
 }
 
 func doRequestResponse(ctx context.Context, service proto.AppServiceClient) {
@@ -57,6 +60,28 @@ func doRequestResponseWithInterrupt(ctx context.Context, service proto.AppServic
 		log.Fatalln(err)
 	}
 	fmt.Println("Add Operation : Result =", addResponse.GetResult())
+}
+
+func doRequestResponseWithTimeout(ctx context.Context, service proto.AppServiceClient) {
+	req := &proto.AddRequest{
+		X: 100,
+		Y: 200,
+	}
+	timeOutCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	defer cancel()
+	res, err := service.Add(timeOutCtx, req)
+	if err != nil {
+		statusErr, ok := status.FromError(err)
+		if ok {
+			if statusErr.Code() == codes.DeadlineExceeded {
+				fmt.Println("Timeout error")
+			} else {
+				log.Fatalln(err)
+			}
+		}
+		log.Fatalln(err)
+	}
+	fmt.Println("Result = ", res.GetResult())
 }
 
 func doServerStreaming(ctx context.Context, service proto.AppServiceClient) {
