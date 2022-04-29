@@ -26,6 +26,16 @@ func (products Products) Filter(predicate func(product Product) bool) Products {
 	return result
 }
 
+func Filter[T any](items []T, predicate func(item T) bool) []T {
+	result := []T{}
+	for _, p := range items {
+		if predicate(p) {
+			result = append(result, p)
+		}
+	}
+	return result
+}
+
 func (products Products) All(predicate func(product Product) bool) bool {
 	for _, p := range products {
 		if !predicate(p) {
